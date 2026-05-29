@@ -103,3 +103,44 @@ class QdrantDocumentStore:
             with_payload=True,
         )
         return response.points
+
+    def load_all_points(self, batch_size: int = 256) -> list[Any]:
+        """Load all stored points with payloads and vectors for clustering."""
+
+        points: list[Any] = []
+        offset = None
+
+        while True:
+            batch, offset = self.client.scroll(
+                collection_name=self.collection_name,
+                limit=batch_size,
+                offset=offset,
+                with_payload=True,
+                with_vectors=True,
+            )
+            points.extend(batch)
+
+            if offset is None:
+                break
+
+        return points
+
+    def set_payload(self, doc_id: int, payload: dict[str, Any]) -> None:
+        """Update metadata for one document without changing its vector."""
+
+        self.client.set_payload(
+            collection_name=self.collection_name,
+            payload=payload,
+            points=[doc_id],
+        )
+
+    def get_point(self, doc_id: int) -> Any | None:
+        """Fetch one stored point by document id."""
+
+        points = self.client.retrieve(
+            collection_name=self.collection_name,
+            ids=[doc_id],
+            with_payload=True,
+            with_vectors=True,
+        )
+        return points[0] if points else None

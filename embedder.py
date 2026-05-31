@@ -22,13 +22,13 @@ class TextEmbedder:
         return self.model.encode(
             texts,
             batch_size=batch_size,
-            convert_to_numpy=True,
+            convert_to_numpy=True,  #instead of pythorch tensors
             normalize_embeddings=True,
             show_progress_bar=True,
         )
 
     def embed_query(self, query: str) -> list[float]:
-        """Embed one search query as a Qdrant-ready vector."""
+        """Embed ONE search query as a Qdrant-ready vector."""
 
         embedding = self.model.encode(
             query,
@@ -36,4 +36,4 @@ class TextEmbedder:
             normalize_embeddings=True,
             show_progress_bar=False,
         )
-        return embedding.astype(float).tolist()
+        return embedding.astype(float).tolist()  # numpy array to python list

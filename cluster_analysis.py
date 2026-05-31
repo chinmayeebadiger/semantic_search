@@ -2,46 +2,46 @@
 
 from __future__ import annotations
 
-from dataclasses import dataclass
+from dataclasses import dataclass   #creates data containers
 
-import numpy as np
+import numpy as np  #matrix operations
 
-from gmm_cluster import ClusteredDocument
+from gmm_cluster import ClusteredDocument   #document objects coming from your clustering pipeline
 
 
 @dataclass(frozen=True)
-class DocumentClusterScore:
+class DocumentClusterScore:#container taht stored info about document after scoring
     """A document plus its cluster-confidence summary."""
 
     doc_id: int
     dominant_cluster: int
-    confidence: float
+    confidence: float   #probability of dominant cluster
     category: str
     text: str
 
 
-def _preview(text: str, max_length: int = 220) -> str:
+def _preview(text: str, max_length: int = 220) -> str:  #creates a short preview
     """Return a compact one-line document preview."""
 
     return text.replace("\n", " ")[:max_length]
 
 
-def score_documents(
+def score_documents(    #rows =documents, columns = clusters n their probability for that documents - creates a huge matrix
     documents: list[ClusteredDocument],
     probabilities: np.ndarray,
 ) -> list[DocumentClusterScore]:
     """Compute dominant cluster and confidence for each document."""
 
     scores: list[DocumentClusterScore] = []
-    dominant_clusters = probabilities.argmax(axis=1)
-    confidence_scores = probabilities.max(axis=1)
+    dominant_clusters = probabilities.argmax(axis=1)    #no of columns becomes1 - the est cluster for each doc
+    confidence_scores = probabilities.max(axis=1)   #replaces each value with its confidence score
 
     for document, dominant_cluster, confidence in zip(
         documents,
         dominant_clusters,
         confidence_scores,
     ):
-        scores.append(
+        scores.append(  #creates score objects and storese them in a array 
             DocumentClusterScore(
                 doc_id=document.id,
                 dominant_cluster=int(dominant_cluster),
@@ -54,7 +54,7 @@ def score_documents(
     return scores
 
 
-def representative_documents_per_cluster(
+def representative_documents_per_cluster(   #for eachcluster it sorts whcich doc is more relavent - usefull to understand what eachcc cluster means
     documents: list[ClusteredDocument],
     probabilities: np.ndarray,
     top_n: int = 3,
@@ -79,7 +79,7 @@ def representative_documents_per_cluster(
     return representatives
 
 
-def ambiguous_documents(
+def ambiguous_documents(    #seperates docuemnts with confidence score below a treshold
     documents: list[ClusteredDocument],
     probabilities: np.ndarray,
     threshold: float = 0.55,
@@ -99,7 +99,7 @@ def ambiguous_documents(
     return sorted(uncertain, key=lambda score: score.confidence)[:top_n]
 
 
-def high_confidence_documents(
+def high_confidence_documents(  #Find documents that clearly belong to one cluster(more than a threshold) - explained well in doc 
     documents: list[ClusteredDocument],
     probabilities: np.ndarray,
     threshold: float = 0.85,
@@ -114,7 +114,7 @@ def high_confidence_documents(
     return sorted(confident, key=lambda score: score.confidence, reverse=True)[:top_n]
 
 
-def print_representative_documents_per_cluster(
+def print_representative_documents_per_cluster( #print statement - calls representative_documents_per_cluster()
     documents: list[ClusteredDocument],
     probabilities: np.ndarray,
     top_n: int = 3,
@@ -138,7 +138,7 @@ def print_representative_documents_per_cluster(
             print(f"  {_preview(document.text)}")
 
 
-def print_scored_documents(
+def print_scored_documents( #generic printer - ex:"most ambigious documents"
     title: str,
     documents: list[DocumentClusterScore],
 ) -> None:

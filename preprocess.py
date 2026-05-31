@@ -15,12 +15,12 @@ class Document:
 
     id: int
     original_text: str
-    text: str
+    text: str       #normalized  
     category: str
 
-
-_WHITESPACE_RE = re.compile(r"\s+")
-_QUOTE_RE = re.compile(r"^\s*(>|->|\||[a-zA-Z]{1,5}>)")
+#regex. 
+_WHITESPACE_RE = re.compile(r"\s+")     #whitespaces
+_QUOTE_RE = re.compile(r"^\s*(>|->|\||[a-zA-Z]{1,5}>)")     #email and quoted
 
 
 DEFAULT_LOCAL_ARCHIVE = Path(
@@ -55,7 +55,7 @@ def remove_headers_footers_quotes(text: str) -> str:
             continue
         if " writes:" in stripped.lower() or stripped.lower().startswith("in article "):
             continue
-        if stripped.startswith(("---", "--", "___")):
+        if stripped.startswith(("---", "--", "___")): #end at signature  
             break
         if stripped.lower().startswith(("* origin:", "begin forwarded message")):
             break
@@ -85,12 +85,12 @@ def _load_documents_from_local_archive(
                 continue
 
             _, category, _ = parts
-            members_by_category[category].append(member)
+            members_by_category[category].append(member) #group files by category
 
         categories = sorted(members_by_category)
         category_index = 0
         while categories and (max_documents is None or len(documents) < max_documents):
-            category = categories[category_index % len(categories)]
+            category = categories[category_index % len(categories)] #round robin - distributed dataset. 
             members = members_by_category[category]
             member = members.pop(0)
 
@@ -114,7 +114,7 @@ def _load_documents_from_local_archive(
                     category_index += 1
                 continue
 
-            documents.append(
+            documents.append( #final clean doc object form- used
                 Document(
                     id=next_id,
                     original_text=cleaned_text.strip(),
@@ -133,7 +133,7 @@ def _load_documents_from_local_archive(
     return documents
 
 
-def _load_documents_from_sklearn(
+def _load_documents_from_sklearn(               #alternative
     subset: str,
     max_documents: int | None,
 ) -> list[Document]:

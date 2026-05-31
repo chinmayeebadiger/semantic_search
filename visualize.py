@@ -9,7 +9,7 @@ os.environ.setdefault("MPLCONFIGDIR", "/private/tmp/matplotlib")
 
 import matplotlib.pyplot as plt
 import numpy as np
-from sklearn.decomposition import PCA
+from sklearn.decomposition import PCA   #reduces high dimentional embeddings - reduces it to 2 dimensions we can see ona graph
 
 
 def reduce_embeddings_pca(
@@ -20,15 +20,14 @@ def reduce_embeddings_pca(
     """Reduce embeddings for visualization with PCA.
 
     PCA gives a fast, deterministic projection that helps inspect whether GMM
-    clusters occupy distinct regions. UMAP can be added later if the project
-    needs nonlinear structure, but PCA keeps Part 2 lightweight.
+    clusters occupy distinct regions. 
     """
 
     reducer = PCA(n_components=n_components, random_state=random_state)
-    return reducer.fit_transform(embeddings)
+    return reducer.fit_transform(embeddings) #with only 2 dimesnions
 
 
-def plot_clusters(
+def plot_clusters(  # output - cluster_visualisation.png
     reduced_embeddings: np.ndarray,
     dominant_clusters: np.ndarray,
     probabilities: np.ndarray,
@@ -65,7 +64,7 @@ def plot_clusters(
     return path
 
 
-def plot_model_selection(
+def plot_model_selection(   #output cluster_model_selection.png
     cluster_counts: list[int],
     bic_scores: list[float],
     aic_scores: list[float],

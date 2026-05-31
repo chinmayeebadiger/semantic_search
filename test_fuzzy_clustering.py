@@ -33,7 +33,7 @@ from visualize import plot_clusters, plot_model_selection, reduce_embeddings_pca
 def main() -> None:
     """Train GMM, store cluster payloads, analyze results, and save plots."""
 
-    store = QdrantDocumentStore(mode="localhost")
+    store = QdrantDocumentStore(mode="localhost")   #connects to qdrant
 
     documents, model, probabilities = cluster_documents(
         store=store,

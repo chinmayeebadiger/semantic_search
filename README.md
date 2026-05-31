@@ -39,6 +39,20 @@ count experiments with BIC, AIC, and silhouette score, and saves:
 - `cluster_visualization.png`
 - `cluster_model_selection.png`
 
+## Run Semantic Cache
+
+After Qdrant has vectors loaded, run:
+
+```bash
+python test_semantic_cache.py
+```
+
+The cache is in memory only. It stores the original query, query embedding,
+retrieval result, dominant cluster, and timestamp. Incoming queries are embedded
+and compared with cached query embeddings using cosine similarity. When
+cluster-aware mode is enabled, only cached entries in the same dominant GMM
+cluster are compared.
+
 ## In-Memory Option
 
 For a no-server run, instantiate the store with:

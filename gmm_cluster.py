@@ -40,7 +40,8 @@ class ClusterExperimentResult:
 
 
 def load_document_embeddings(store: QdrantDocumentStore) -> list[ClusteredDocument]:
-    """Load document ids, vectors, text, and category labels from Qdrant."""
+    #Load document ids, vectors, text, and category labels from Qdrant
+    #qdrant = persistent semantci memory.  
 
     documents: list[ClusteredDocument] = []
     for point in store.load_all_points():
@@ -61,7 +62,7 @@ def load_document_embeddings(store: QdrantDocumentStore) -> list[ClusteredDocume
 
 
 def vectors_to_matrix(documents: list[ClusteredDocument]) -> np.ndarray:
-    """Convert loaded Qdrant vectors into a 2D numpy matrix."""
+    """Convert loaded Qdrant vectors into a 2D numpy matrix - ml models expect matrices"""
 
     if not documents:
         raise ValueError("No documents with vectors were loaded from Qdrant")
@@ -69,7 +70,7 @@ def vectors_to_matrix(documents: list[ClusteredDocument]) -> np.ndarray:
     return np.asarray([document.vector for document in documents], dtype=np.float32)
 
 
-def reduce_for_clustering(
+def reduce_for_clustering(      #PCA dimensionality reduction
     embeddings: np.ndarray,
     n_components: int = 25,
     random_state: int = 42,
@@ -87,8 +88,8 @@ def reduce_for_clustering(
     if max_components < 2:
         return embeddings
 
-    reducer = PCA(n_components=max_components, random_state=random_state)
-    return reducer.fit_transform(embeddings)
+    reducer = PCA(n_components=max_components, random_state=random_state)   #PCA compresses info
+    return reducer.fit_transform(embeddings) #learning imp directions and prjects vectors into compresses space
 
 
 def train_gmm(
@@ -98,18 +99,18 @@ def train_gmm(
 ) -> GaussianMixture:
     """Train a soft clustering model over document embeddings."""
 
-    model = GaussianMixture(
+    model = GaussianMixture(    #clustering algo 
         n_components=n_clusters,
         covariance_type="diag",
-        reg_covar=1e-3,
+        reg_covar=1e-3, #regularization 
         random_state=random_state,
-        n_init=3,
+        n_init=3, #trains model 3 times with diff rand starts
     )
-    model.fit(embeddings)
+    model.fit(embeddings)   #training step
     return model
 
 
-def cluster_documents(
+def cluster_documents(  #master piprline function 
     store: QdrantDocumentStore,
     n_clusters: int = 20,
     pca_components: int = 25,
@@ -117,20 +118,20 @@ def cluster_documents(
 ) -> tuple[list[ClusteredDocument], GaussianMixture, np.ndarray]:
     """Train GMM and store dominant cluster plus probabilities in Qdrant."""
 
-    documents = load_document_embeddings(store)
-    embeddings = vectors_to_matrix(documents)
-    clustering_features = reduce_for_clustering(
+    documents = load_document_embeddings(store) #laods vectors from qdrant 
+    embeddings = vectors_to_matrix(documents)   #convert to matrix
+    clustering_features = reduce_for_clustering(    #compress vectors
         embeddings=embeddings,
         n_components=pca_components,
         random_state=random_state,
     )
-    model = train_gmm(
+    model = train_gmm(  #trins clustering model
         embeddings=clustering_features,
         n_clusters=n_clusters,
         random_state=random_state,
     )
-    probabilities = model.predict_proba(clustering_features)
-    dominant_clusters = probabilities.argmax(axis=1)
+    probabilities = model.predict_proba(clustering_features)    #returns prob for each doc of which cluster it is a part of
+    dominant_clusters = probabilities.argmax(axis=1)    #finds highest probability cluster
 
     for document, dominant_cluster, cluster_probabilities in zip(
         documents,
@@ -139,7 +140,7 @@ def cluster_documents(
     ):
         # Soft clustering matters because this full probability vector shows
         # whether a document is clearly assigned or semantically ambiguous.
-        store.set_payload(
+        store.set_payload(      #adds cluster metadata back to vdb
             doc_id=document.id,
             payload={
                 "dominant_cluster": int(dominant_cluster),
@@ -152,24 +153,24 @@ def cluster_documents(
     return documents, model, probabilities
 
 
-def get_cluster_distribution(
+def get_cluster_distribution(   #get stored cluster porbabilitsef or 1 document
     store: QdrantDocumentStore,
     doc_id: int,
 ) -> list[float] | None:
     """Return the stored cluster-probability distribution for one document."""
 
-    point = store.get_point(doc_id)
+    point = store.get_point(doc_id) #fetches vector entry from qdrant 
     if point is None or point.payload is None:
         return None
 
-    probabilities = point.payload.get("cluster_probabilities")
+    probabilities = point.payload.get("cluster_probabilities")  #gets stored clustering metadata- extract payload
     if probabilities is None:
         return None
 
     return [float(probability) for probability in probabilities]
 
 
-def experiment_cluster_counts(
+def experiment_cluster_counts(  #find the best no of clusters for the given dataset
     embeddings: np.ndarray,
     cluster_counts: list[int],
     pca_components: int = 25,
@@ -193,13 +194,13 @@ def experiment_cluster_counts(
 
         silhouette = None
         if 1 < len(set(labels)) < len(clustering_features):
-            silhouette = float(silhouette_score(clustering_features, labels))
+            silhouette = float(silhouette_score(clustering_features, labels))   # how cleanly sereperated are clusters
 
         results.append(
             ClusterExperimentResult(
                 n_clusters=n_clusters,
-                bic=float(model.bic(clustering_features)),
-                aic=float(model.aic(clustering_features)),
+                bic=float(model.bic(clustering_features)),  #accuracy vs completxity
+                aic=float(model.aic(clustering_features)),  #god fit without overcomplicating - both need to be low
                 silhouette=silhouette,
             )
         )

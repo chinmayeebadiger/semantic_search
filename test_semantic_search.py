@@ -1,8 +1,6 @@
-"""Smoke test for the Part 1 semantic search pipeline.
+"""Smoke test for the Part 1 semantic search pipeline."""
 
-Run:
-    python test_semantic_search.py
-"""
+#end to end pipeline test  
 
 from __future__ import annotations
 
@@ -21,12 +19,12 @@ def main() -> None:
     )
     print(f"Loaded {len(documents)} preprocessed documents.")
 
-    embedder = TextEmbedder()
-    embeddings = embedder.embed_texts([document.text for document in documents])
+    embedder = TextEmbedder()       #initializes embedding model    
+    embeddings = embedder.embed_texts([document.text for document in documents])    #generate embeddings
 
     store = QdrantDocumentStore(mode="localhost")
     store.recreate_collection()
-    store.upsert_documents(documents, embeddings.astype(float).tolist())
+    store.upsert_documents(documents, embeddings.astype(float).tolist())    #embedding models return numpy. but quadrant returns python lists
     print("Inserted vectors into the semantic_documents collection.")
 
     searcher = SemanticSearcher(store=store, embedder=embedder)

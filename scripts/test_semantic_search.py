@@ -4,10 +4,10 @@
 
 from __future__ import annotations
 
-from embedder import TextEmbedder
-from preprocess import DEFAULT_LOCAL_ARCHIVE, load_20newsgroups_documents
-from qdrant_store import QdrantDocumentStore
-from search import SemanticSearcher
+from core.embedder import TextEmbedder
+from core.preprocess import DEFAULT_LOCAL_ARCHIVE, load_20newsgroups_documents
+from core.qdrant_store import QdrantDocumentStore
+from core.search import SemanticSearcher
 
 
 def main() -> None:

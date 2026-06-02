@@ -16,7 +16,7 @@ from sklearn.mixture import GaussianMixture
 from sklearn.metrics import silhouette_score
 from sklearn.decomposition import PCA
 
-from qdrant_store import QdrantDocumentStore
+from core.qdrant_store import QdrantDocumentStore
 
 
 @dataclass(frozen=True)

@@ -6,7 +6,7 @@ from dataclasses import dataclass   #creates data containers
 
 import numpy as np  #matrix operations
 
-from gmm_cluster import ClusteredDocument   #document objects coming from your clustering pipeline
+from clustering.gmm_cluster import ClusteredDocument   #document objects coming from your clustering pipeline
 
 
 @dataclass(frozen=True)

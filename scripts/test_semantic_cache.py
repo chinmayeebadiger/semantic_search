@@ -2,18 +2,18 @@
 
 Run Qdrant first and populate vectors:
     docker compose up -d
-    python test_semantic_search.py
+    python scripts/test_semantic_search.py
 
 Run:
-    python test_semantic_cache.py
+    python scripts/test_semantic_cache.py
 """
 
 from __future__ import annotations
 
-from embedder import TextEmbedder
-from qdrant_store import QdrantDocumentStore
-from search import SemanticSearcher
-from semantic_cache import SemanticCache, build_query_clusterer
+from cache.semantic_cache import SemanticCache, build_query_clusterer
+from core.embedder import TextEmbedder
+from core.qdrant_store import QdrantDocumentStore
+from core.search import SemanticSearcher
 
 
 def print_cache_result(query: str, cache_hit: bool, matched_query: str | None, score: float) -> None:

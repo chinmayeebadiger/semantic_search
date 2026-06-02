@@ -4,30 +4,30 @@ Run Qdrant first:
     docker compose up -d
 
 Then make sure vectors exist:
-    python test_semantic_search.py
+    python scripts/test_semantic_search.py
 
 Run:
-    python test_fuzzy_clustering.py
+    python scripts/test_fuzzy_clustering.py
 """
 
 from __future__ import annotations
 
 import numpy as np
 
-from cluster_analysis import (
+from clustering.cluster_analysis import (
     ambiguous_documents,
     high_confidence_documents,
     print_representative_documents_per_cluster,
     print_scored_documents,
 )
-from gmm_cluster import (
+from clustering.gmm_cluster import (
     cluster_documents,
     experiment_cluster_counts,
     get_cluster_distribution,
     vectors_to_matrix,
 )
-from qdrant_store import QdrantDocumentStore
-from visualize import plot_clusters, plot_model_selection, reduce_embeddings_pca
+from clustering.visualize import plot_clusters, plot_model_selection, reduce_embeddings_pca
+from core.qdrant_store import QdrantDocumentStore
 
 
 def main() -> None:
@@ -90,12 +90,14 @@ def main() -> None:
         reduced_embeddings=reduced_embeddings,
         dominant_clusters=dominant_clusters,
         probabilities=probabilities,
+        output_path="artifacts/cluster_visualization.png",
     )
     selection_plot = plot_model_selection(
         cluster_counts=[result.n_clusters for result in experiments],
         bic_scores=[result.bic for result in experiments],
         aic_scores=[result.aic for result in experiments],
         silhouette_scores=[result.silhouette for result in experiments],
+        output_path="artifacts/cluster_model_selection.png",
     )
 
     cluster_sizes = np.bincount(dominant_clusters, minlength=20)

@@ -22,6 +22,12 @@ class CacheMetrics:
 
         self.miss_count += 1
 
+    def reset(self) -> None:
+        """Reset cache counters after clearing the in-memory cache."""
+
+        self.hit_count = 0
+        self.miss_count = 0
+
     @property
     def total_requests(self) -> int:
         """Total number of cache lookups."""

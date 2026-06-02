@@ -7,8 +7,8 @@ from typing import Any
 from qdrant_client import QdrantClient
 from qdrant_client.models import Distance, PointStruct, VectorParams
 
-from embedder import EMBEDDING_DIMENSION
-from preprocess import Document
+from core.embedder import EMBEDDING_DIMENSION
+from core.preprocess import Document
 
 
 COLLECTION_NAME = "semantic_documents"

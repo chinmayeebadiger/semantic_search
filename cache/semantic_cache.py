@@ -24,15 +24,15 @@ import numpy as np
 from sklearn.decomposition import PCA
 from sklearn.mixture import GaussianMixture
 
-from cache_metrics import (
+from cache.cache_metrics import (
     CacheMetrics,
     ThresholdEvaluation,
     print_threshold_evaluations,
 )
-from embedder import TextEmbedder
-from gmm_cluster import load_document_embeddings, train_gmm, vectors_to_matrix
-from qdrant_store import QdrantDocumentStore
-from search import SearchResult, SemanticSearcher
+from clustering.gmm_cluster import load_document_embeddings, train_gmm, vectors_to_matrix
+from core.embedder import TextEmbedder
+from core.qdrant_store import QdrantDocumentStore
+from core.search import SearchResult, SemanticSearcher
 
 
 @dataclass(frozen=True)
@@ -168,6 +168,12 @@ class SemanticCache:
                 timestamp=datetime.now(timezone.utc),
             )
         )
+
+    def clear(self) -> None:
+        """Remove all cached entries and reset cache metrics."""
+
+        self.entries.clear()
+        self.metrics.reset()
 
     def evaluate_thresholds(
         self,

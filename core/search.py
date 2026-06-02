@@ -5,8 +5,8 @@ from __future__ import annotations
 
 from dataclasses import dataclass
 
-from embedder import TextEmbedder
-from qdrant_store import QdrantDocumentStore
+from core.embedder import TextEmbedder
+from core.qdrant_store import QdrantDocumentStore
 
 
 @dataclass(frozen=True)

@@ -1,0 +1,125 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Semantic Search Pipeline</title>
+    <link rel="stylesheet" href="/static/styles.css" />
+  </head>
+  <body>
+    <main class="shell">
+      <section class="hero">
+        <div>
+          <p class="eyebrow">FastAPI · Qdrant · MiniLM · GMM</p>
+          <h1>Semantic Search Pipeline</h1>
+          <p class="summary">
+            Vector retrieval with cluster-aware semantic caching, built for quick
+            query demos and clear explanation of the backend workflow.
+          </p>
+        </div>
+        <div class="status-panel" aria-live="polite">
+          <span class="status-dot" id="apiDot"></span>
+          <div>
+            <p class="status-label">Service</p>
+            <p id="apiStatus">Checking API...</p>
+          </div>
+        </div>
+      </section>
+
+      <section class="metrics" aria-label="Cache metrics">
+        <article>
+          <span>Total cached</span>
+          <strong id="totalEntries">0</strong>
+        </article>
+        <article>
+          <span>Cache hits</span>
+          <strong id="hitCount">0</strong>
+        </article>
+        <article>
+          <span>Cache misses</span>
+          <strong id="missCount">0</strong>
+        </article>
+        <article>
+          <span>Hit rate</span>
+          <strong id="hitRate">0%</strong>
+        </article>
+      </section>
+
+      <section class="workspace">
+        <form class="search-panel" id="queryForm">
+          <div class="form-header">
+            <div>
+              <p class="eyebrow">Live demo</p>
+              <h2>Ask the index</h2>
+            </div>
+            <button class="ghost" type="button" id="clearCache">Clear cache</button>
+          </div>
+          <label for="queryInput">Query</label>
+          <div class="query-row">
+            <input
+              id="queryInput"
+              name="query"
+              type="search"
+              value="space shuttle mission and nasa orbit"
+              autocomplete="off"
+            />
+            <button type="submit" id="searchButton">Search</button>
+          </div>
+          <div class="chips" aria-label="Example queries">
+            <button type="button" data-query="space shuttle mission and nasa orbit">Space</button>
+            <button type="button" data-query="computer graphics windows driver">Graphics</button>
+            <button type="button" data-query="hockey team playoff game">Sports</button>
+          </div>
+        </form>
+
+        <aside class="insight-panel">
+          <p class="eyebrow">Current response</p>
+          <div class="response-grid">
+            <div>
+              <span>Cache</span>
+              <strong id="cacheHit">Pending</strong>
+            </div>
+            <div>
+              <span>Cluster</span>
+              <strong id="clusterId">-</strong>
+            </div>
+            <div>
+              <span>Match score</span>
+              <strong id="matchScore">-</strong>
+            </div>
+          </div>
+          <p class="matched" id="matchedQuery"></p>
+        </aside>
+      </section>
+
+      <section class="results-section">
+        <div class="section-title">
+          <p class="eyebrow">Retrieved documents</p>
+          <h2>Top results</h2>
+        </div>
+        <div class="results" id="results">
+          <p class="empty">Run a query to show semantically similar documents.</p>
+        </div>
+      </section>
+
+      <section class="artifact-section">
+        <div class="section-title">
+          <p class="eyebrow">Clustering artifacts</p>
+          <h2>Model outputs</h2>
+        </div>
+        <div class="artifact-grid">
+          <figure>
+            <img src="/artifacts/cluster_visualization.png" alt="Cluster visualization" />
+            <figcaption>2D cluster visualization from the stored embeddings.</figcaption>
+          </figure>
+          <figure>
+            <img src="/artifacts/cluster_model_selection.png" alt="Cluster model selection chart" />
+            <figcaption>Cluster count comparison using model selection metrics.</figcaption>
+          </figure>
+        </div>
+      </section>
+    </main>
+
+    <script src="/static/app.js"></script>
+  </body>
+</html>
